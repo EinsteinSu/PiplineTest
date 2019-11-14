@@ -1,0 +1,76 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json",
+  "contentVersion": "1.0.0.0",
+  "outputs": {
+    "labDCVMId": {
+      "type": "string",
+      "value": "[variables('vmId')]"
+    }
+  },
+  "parameters": {
+    "vmName": {
+      "type": "string",
+      "defaultValue": "AMEX16-DC-auto"
+    },
+    "labName": {
+      "type": "string",
+      "defaultValue": "AMAutoTestLab"
+    },
+    "size": {
+      "type": "string",
+      "defaultValue": "Standard_A5"
+    },
+    "userName": {
+      "type": "string",
+      "defaultValue": "azadmin"
+    },
+    "password": {
+      "type": "securestring",
+      "defaultValue": "[[[azadmin]]"
+    },
+    "ipAddress": {
+      "type": "string",
+      "defaultValue": "192.168.23.100"
+    },
+    "virtualNetworkName": {
+      "type": "string",
+      "defaultValue": "AM-AutoTest-EX16"
+    },
+    "imageName": {
+      "type": "string",
+      "defaultValue": "mar1-prepared-dc"
+    }
+  },
+  "resources": [
+    {
+      "apiVersion": "2017-04-26-preview",
+      "location": "[resourceGroup().location]",
+      "name": "[variables('vmName')]",
+      "properties": {
+        "labVirtualNetworkId": "[variables('labVirtualNetworkId')]",
+        "notes": "AM_Autotest_DC_EX16",
+        "customImageId": "[variables('imageId')]",
+        "size": "[parameters('size')]",
+        "userName": "[parameters('userName')]",
+        "password": "[parameters('password')]",
+        "isAuthenticationWithSshKey": false,
+        "labSubnetName": "[variables('labSubnetName')]",
+        "disallowPublicIpAddress": false,
+        "storageType": "Standard",
+        "allowClaim": false,
+        "networkInterface": {
+          "privateIpAddress": "[parameters('ipAddress')]"
+        }
+      },
+      "type": "Microsoft.DevTestLab/labs/virtualmachines"
+    }
+  ],
+  "variables": {
+    "labSubnetName": "default",
+    "labVirtualNetworkId": "[resourceId('Microsoft.DevTestLab/labs/virtualnetworks', parameters('labName'), variables('labVirtualNetworkName'))]",
+    "labVirtualNetworkName": "[parameters('virtualNetworkName')]",
+    "vmId": "[resourceId ('Microsoft.DevTestLab/labs/virtualmachines', parameters('labName'), parameters('vmName'))]",
+    "vmName": "[concat(parameters('labName'), '/', parameters('vmName'))]",
+    "imageId": "[concat('/subscriptions/6c38ccbb-3ef0-44e5-a0b1-b4ea617abcf8/resourcegroups/amautotestlabrg/providers/microsoft.devtestlab/labs/amautotestlab/customimages/',parameters('imageName'))]"
+  }
+}
