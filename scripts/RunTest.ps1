@@ -48,6 +48,8 @@ $vmSize = "Standard_DS3"
 $location = "WestUS"
 $nsgName = "dc-nsg"
 
+Write-Host "Outlook versin $OutlookVersion"
+
 $exchangeVersion = "Ex2019_CU3";
 $os = "Win2019"
 $dbVersion = "SQL2014"
