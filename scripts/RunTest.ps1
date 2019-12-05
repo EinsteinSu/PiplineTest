@@ -58,7 +58,7 @@ function Get-ExecutionCommand($Name, $Value){
     if([String]::IsNullOrEmpty($Value)){
         return "";
     }
-    Write-Host "-$Name:$Value"
+    Write-Host "-$Name $Value"
     return "-$Name $Value ";
 }
 
