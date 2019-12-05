@@ -59,6 +59,10 @@ function Get-ExecutionCommand($Name, $Value){
     return "-$Name $Value ";
 }
 
+Write-Host "Log in Azure"
+$tenant = "91c369b5-1c9e-439c-989c-1867ec606603";
+$cred =  New-Object System.Management.Automation.PSCredential ($AzAccount,(ConvertTo-SecureString $AzPassword -AsPlainText -Force)) 
+Connect-AzAccount -ServicePrincipal -Tenant $tenant -Credential $cred
 
 $tags = [ordered]@{Type = "DC";  ExchangeVersion = $exchangeVersion; OS = $os}
 $dcSnapshotName = (Get-AzResource -Tag $tags)[0].Name;
@@ -73,7 +77,7 @@ if($null -eq $qamSnapshotName){
     Exit-PSSession;
 }
 
-Write-Output "Creating group $groupName";
+Write-Output "Creating group $testResourceGroupName";
 New-AzResourceGroup -Name $testResourceGroupName -Location $location;
  
 
