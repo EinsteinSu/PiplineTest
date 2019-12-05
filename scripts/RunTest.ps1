@@ -13,9 +13,6 @@ param(
     $StorageKey,
     [Parameter()]
     [string]
-    $StorageConnection,
-    [Parameter()]
-    [string]
     $OutlookVersion,
     [Parameter()]
     [string]
@@ -61,11 +58,12 @@ function Get-ExecutionCommand($Name, $Value){
     Write-Host "-$Name $Value"
     return "-$Name $Value ";
 }
+$storageConnection = "DefaultEndpointsProtocol=https;AccountName=$storageAccountName;AccountKey=$storageKey;EndpointSuffix=core.windows.net";
 
 $command = "powershell -ExecutionPolicy Unrestricted -File startup.ps1 ";
 $command += Get-ExecutionCommand -Name "StorageAccountName" -Value $storageAccountName
 $command += Get-ExecutionCommand -Name "StorageKey" -Value $storageKey
-#$command += Get-ExecutionCommand -Name "StorageConnection" -Value $storageConnection
+
 $command += Get-ExecutionCommand -Name "OutlookVersion" -Value $outlookVersion
 $command += Get-ExecutionCommand -Name "QamInstallerVersion" -Value $qamInstallerVersion
 $command += Get-ExecutionCommand -Name "Branch" -Value $branch
