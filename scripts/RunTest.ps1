@@ -61,6 +61,24 @@ function Get-ExecutionCommand($Name, $Value){
     return "-$Name $Value ";
 }
 
+$command = "powershell -ExecutionPolicy Unrestricted -File startup.ps1 ";
+$command += Get-ExecutionCommand -Name "StorageAccountName" -Value $storageAccountName
+$command += Get-ExecutionCommand -Name "StorageKey" -Value $storageKey
+$command += Get-ExecutionCommand -Name "StorageConnection" -Value $storageConnection
+$command += Get-ExecutionCommand -Name "OutlookVersion" -Value $outlookVersion
+$command += Get-ExecutionCommand -Name "QamInstallerVersion" -Value $qamInstallerVersion
+$command += Get-ExecutionCommand -Name "Branch" -Value $branch
+$command += Get-ExecutionCommand -Name "ArtUserName" -Value $artUserName
+$command += Get-ExecutionCommand -Name "ArtPassword" -Value $artPassword
+$command += Get-ExecutionCommand -Name "TestComponent" -Value $testComponent
+$command += Get-ExecutionCommand -Name "TestTags" -Value $testTags
+$command += Get-ExecutionCommand -Name "InstallFeatures" -Value $installFeatures
+$command += Get-ExecutionCommand -Name "AzAccount" -Value $azAccount
+$command += Get-ExecutionCommand -Name "AzPassword" -Value $azPassword
+
+Write-Host "$command"
+<#
+
 Write-Host "Log in Azure"
 $tenant = "91c369b5-1c9e-439c-989c-1867ec606603";
 $cred =  New-Object System.Management.Automation.PSCredential ($AzAccount,(ConvertTo-SecureString $AzPassword -AsPlainText -Force)) 
@@ -160,3 +178,5 @@ Set-AzVMExtension -ResourceGroupName $testResourceGroupName `
     -TypeHandlerVersion "1.9" `
     -Settings $settings    `
     -ProtectedSettings $protectedSettings
+
+    #>
