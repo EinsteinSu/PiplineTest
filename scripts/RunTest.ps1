@@ -58,6 +58,7 @@ function Get-ExecutionCommand($Name, $Value){
     if([String]::IsNullOrEmpty($Value)){
         return "";
     }
+    Write-Host "-$Name:$Value"
     return "-$Name $Value ";
 }
 
@@ -76,7 +77,7 @@ $command += Get-ExecutionCommand -Name "InstallFeatures" -Value $installFeatures
 $command += Get-ExecutionCommand -Name "AzAccount" -Value $azAccount
 $command += Get-ExecutionCommand -Name "AzPassword" -Value $azPassword
 
-Write-Host "$command"
+
 <#
 
 Write-Host "Log in Azure"
