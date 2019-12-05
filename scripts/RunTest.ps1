@@ -78,8 +78,8 @@ if($null -eq $qamSnapshotName){
     Exit-PSSession;
 }
 
-Write-Output "Creating group $testResourceGroupName";
-New-AzResourceGroup -Name $testResourceGroupName -Location $location;
+#Write-Output "Creating group $testResourceGroupName";
+#New-AzResourceGroup -Name $testResourceGroupName -Location $location;
  
 
 $securityGroup = Get-AzNetworkSecurityGroup -Name $nsgName -ResourceGroupName $groupName;
