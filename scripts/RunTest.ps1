@@ -1,30 +1,56 @@
+param(
+	[Parameter()]
+    [string]
+    $AzAccount,
+	[Parameter()]
+    [string]
+    $AzPassword,
+    [Parameter()]
+    [string]
+    $StorageAccountName,
+    [Parameter()]
+    [string]
+    $StorageKey,
+    [Parameter()]
+    [string]
+    $StorageConnection,
+    [Parameter()]
+    [string]
+    $OutlookVersion,
+    [Parameter()]
+    [string]
+    $QamInstallerVersion,
+    [Parameter()]
+    [string]
+    $Branch,
+    [Parameter()]
+    [string]
+    $ArtUserName,
+    [Parameter()]
+    [string]
+    $ArtPassword,
+    [Parameter()]
+    [string]
+    $TestComponent,
+    [Parameter()]
+    [string]
+    $TestTags,
+    [Parameter()]
+    [string]
+    $InstallFeatures,
+    [Parameter()]
+    [string]
+    $TestResourceGroupName
+)
 $groupName = "AutomationLabs"
-$batch = "01"
 $vitrualNetworkName = "vmNetwork_" + $batch
 $vmSize = "Standard_DS3"
 $location = "WestUS"
 $nsgName = "dc-nsg"
-$testResourceGroupName = "test_" + $batch
 
 $exchangeVersion = "Ex2019_CU3";
 $os = "Win2019"
 $dbVersion = "SQL2014"
-
-$storageAccountName = $env:storageAccountName;
-$storageKey = $env:storageKey;
-$storageConnection = $env:storageConnection;
-$artUserName = $env:artUserName;
-$artPassword = $env:artPassword;
-$branch = $env:branch;
-$qamInstallerVersion = $env:qamInstallerVersion;
-$outlookVersion = $env:outlookVersion;
-$testComponent = $env:testComponent;
-$testTags = $env:testTags;
-$installFeatures = $env:installFeatures;
-$azAccount = $env:azAccount;
-$azPassword = $env:azPassword
-
-
 
 function Get-ExecutionCommand($Name, $Value){
     if([String]::IsNullOrEmpty($Value)){
@@ -110,8 +136,6 @@ $command += Get-ExecutionCommand -Name "TestTags" -Value $testTags
 $command += Get-ExecutionCommand -Name "InstallFeatures" -Value $installFeatures
 $command += Get-ExecutionCommand -Name "AzAccount" -Value $azAccount
 $command += Get-ExecutionCommand -Name "AzPassword" -Value $azPassword
-
-
 
 $protectedSettings = @{"storageAccountName" = $storageAccountName; "storageAccountKey" = $storageKey; "commandToExecute" = $command};
 #run command
