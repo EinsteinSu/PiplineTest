@@ -39,11 +39,8 @@ param(
     [string]
     $TestResourceGroupName
 )
-if($OutlookVersions){
-    $OutlookVersions.GetType()
-}
-Write-Host $OutlookVersions
-<#$groupName = "AutomationLabs"
+
+$groupName = "AutomationLabs"
 $vitrualNetworkName = "vmNetwork_" + $batch
 $vmSize = "Standard_DS3"
 $location = "WestUS"
@@ -120,7 +117,7 @@ if($null -eq $qamSnapshotName){
     Exit-PSSession;
 }
 
-foreach($outlookVersion in $OutlookVersions -split ','){
+foreach($outlookVersion in $OutlookVersions.Split(',')){
     $outlookVersion = $outlookVersion.Trim();
     Write-Host "Testing for Outlook $outlookVersion in $exchangeVersion $os $dbVersion";
     $securityGroup = Get-AzNetworkSecurityGroup -Name $nsgName -ResourceGroupName $groupName;
@@ -149,7 +146,7 @@ foreach($outlookVersion in $OutlookVersions -split ','){
         -TypeHandlerVersion "1.9" `
         -Settings $settings    `
         -ProtectedSettings $protectedSettings
-}#>
+}
 
 
  
