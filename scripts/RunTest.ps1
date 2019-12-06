@@ -41,7 +41,7 @@ param(
 )
 
 $groupName = "AutomationLabs"
-$vitrualNetworkName = "vmNetwork_" + $batch
+
 $vmSize = "Standard_DS3"
 $location = "WestUS"
 $nsgName = "dc-nsg"
@@ -122,13 +122,13 @@ foreach($outlookVersion in $OutlookVersions.Split(',')){
     $outlookVersion = $outlookVersion.Trim();
     Write-Host "Testing for Outlook $outlookVersion in $exchangeVersion $os $dbVersion";
     $securityGroup = Get-AzNetworkSecurityGroup -Name $nsgName -ResourceGroupName $groupName;
-    $subnetConfigName = "subnet_" + $batch;
+    $subnetConfigName = "subnet_$outlookVersion";
     $subnetConfig = New-AzVirtualNetworkSubnetConfig -Name $subnetConfigName -AddressPrefix 172.31.11.0/24 -NetworkSecurityGroup $securityGroup;
      
-    
-    Write-Output "Creating the virtual network"
+    $vitrualNetworkName = "vmNetwork_$outlookVersion";
+    Write-Output "Creating the virtual network $vitrualNetworkName"
     $vnet = New-AzVirtualNetwork -Name $vitrualNetworkName -ResourceGroupName $testResourceGroupName -Location $location -AddressPrefix 172.31.0.0/16 -Subnet $subnetConfig;
-    
+
     $vmDcName = "dc$outlookVersion";
     $vmQAMName = "qam$outlookVersion";
     New-VM -VmName $vmDcName -SnapshotName $dcSnapshotName -IpAddress "172.31.11.5" -Vnet $vnet -OutlookVersion $outlookVersion;
