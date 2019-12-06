@@ -13,4 +13,5 @@ $storageAccount = Get-AzStorageAccount -Name $StorageAccountName -ResourceGroupN
 $ctx = $storageAccount.Context;
 $container = "startup"
 Write-Host "Copying $FileName to $Destination"
+$Destination = $Destination + "\"
 Get-AzStorageBlobContent -Blob $FileName -Container $container -Destination $Destination -Context $ctx -Force
