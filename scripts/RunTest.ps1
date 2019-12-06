@@ -127,8 +127,9 @@ foreach($outlookVersion in $OutlookVersions.Split(',')){
     
     Write-Output "Creating the virtual network"
     $vnet = New-AzVirtualNetwork -Name $vitrualNetworkName -ResourceGroupName $testResourceGroupName -Location $location -AddressPrefix 172.31.0.0/16 -Subnet $subnetConfig;
-    New-VM -vmName "dc" -snapshotName $dcSnapshotName -ipAddress "172.31.11.5" -vnet $vnet;
-    New-VM -vmName "qam" -snapshotName $qamSnapshotName -ipAddress "172.31.11.4" -vnet $vnet;
+
+    New-VM -vmName "dc$outlookVersion" -snapshotName $dcSnapshotName -ipAddress "172.31.11.5" -vnet $vnet;
+    New-VM -vmName "qam$outlookVersion" -snapshotName $qamSnapshotName -ipAddress "172.31.11.4" -vnet $vnet;
 
     $command = Get-ExtensionCommand -outlookVersion $outlookVersion
     Write-Host "Start getting the startup script to install QAM"
