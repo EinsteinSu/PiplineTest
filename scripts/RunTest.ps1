@@ -75,7 +75,7 @@ function Get-ExtensionCommand($outlookVersion){
     return $command;
 }
 
-function New-VM($VmName, $SnapshotName, $IpAddress, $Vnet, $OutlookVersion, $DnsServer){
+function New-VM($VmName, $SnapshotName, $IpAddress, $Vnet, $OutlookVersion){
     
     Write-Output "Creating $VmName";
     $diskName = "$SnapshotName" +"_" + $OutlookVersion + "_copy";
@@ -98,8 +98,6 @@ function New-VM($VmName, $SnapshotName, $IpAddress, $Vnet, $OutlookVersion, $Dns
     $nicName = ($VmName.ToLower()+'_nic');
     $nic = New-AzNetworkInterface -Name $nicName -ResourceGroupName $testResourceGroupName -Location $snapshot.Location -SubnetId $vnet.Subnets[0].Id -IpConfigurationName $privateIpName -PublicIpAddressId $publicIp.Id;
     $vm = Add-AzVMNetworkInterface -VM $vm -Id $nic.Id;
-    $nic.DnsSettings.DnsServers.Add($DnsServer);
-    $nic | Set-AzNetworkInterface
 
     Write-Output "Creating VM $VmName";
     New-AzVM -VM $vm -ResourceGroupName $testResourceGroupName -Location $snapshot.Location;
@@ -133,8 +131,8 @@ foreach($outlookVersion in $OutlookVersions.Split(',')){
 
     $vmDcName = "dc$outlookVersion";
     $vmQAMName = "qam$outlookVersion";
-    New-VM -VmName $vmDcName -SnapshotName $dcSnapshotName -IpAddress "172.31.11.5" -Vnet $vnet -OutlookVersion $outlookVersion -DnsServer "127.0.0.1";
-    New-VM -VmName $vmQAMName -SnapshotName $qamSnapshotName -IpAddress "172.31.11.4" -Vnet $vnet -OutlookVersion $outlookVersion -DnsServer "172.31.11.5";
+    New-VM -VmName $vmDcName -SnapshotName $dcSnapshotName -IpAddress "172.31.11.5" -Vnet $vnet -OutlookVersion $outlookVersion;
+    New-VM -VmName $vmQAMName -SnapshotName $qamSnapshotName -IpAddress "172.31.11.4" -Vnet $vnet -OutlookVersion $outlookVersion;
 
     $command = Get-ExtensionCommand -outlookVersion $outlookVersion
     Write-Host "Start getting the startup script to install QAM"
