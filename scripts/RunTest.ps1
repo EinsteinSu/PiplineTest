@@ -39,7 +39,10 @@ param(
     [string]
     $TestResourceGroupName
 )
-Write-Host $OutlookVersions
+if($OutlookVersions){
+    $OutlookVersions.GetType()
+}
+
 <#$groupName = "AutomationLabs"
 $vitrualNetworkName = "vmNetwork_" + $batch
 $vmSize = "Standard_DS3"
