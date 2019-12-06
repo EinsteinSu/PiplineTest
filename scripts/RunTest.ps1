@@ -131,8 +131,8 @@ foreach($outlookVersion in $OutlookVersions.Split(',')){
 
     $vmDcName = "dc$outlookVersion";
     $vmQAMName = "qam$outlookVersion";
-    New-VM -VmName $vmDcName -SnapshotName $dcSnapshotName -IpAddress "172.31.11.5" -Vnet $vnet -OutlookVersion $outlookVersion;
-    New-VM -VmName $vmQAMName -SnapshotName $qamSnapshotName -IpAddress "172.31.11.4" -Vnet $vnet -OutlookVersion $outlookVersion;
+    New-VM -VmName $vmDcName -SnapshotName $dcSnapshotName -IpAddress "172.31.11.4" -Vnet $vnet -OutlookVersion $outlookVersion;
+    New-VM -VmName $vmQAMName -SnapshotName $qamSnapshotName -IpAddress "172.31.11.5" -Vnet $vnet -OutlookVersion $outlookVersion;
 
     $command = Get-ExtensionCommand -outlookVersion $outlookVersion
     Write-Host "Start getting the startup script to install QAM"
