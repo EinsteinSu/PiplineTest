@@ -97,9 +97,9 @@ function New-VM($VmName, $SnapshotName, $IpAddress, $Vnet, $OutlookVersion, $Dns
     New-AzNetworkInterfaceIpConfig -Name $privateIpName -Subnet $Vnet.Subnets[0] -PrivateIpAddress $IpAddress -Primary;
     $nicName = ($VmName.ToLower()+'_nic');
     $nic = New-AzNetworkInterface -Name $nicName -ResourceGroupName $testResourceGroupName -Location $snapshot.Location -SubnetId $vnet.Subnets[0].Id -IpConfigurationName $privateIpName -PublicIpAddressId $publicIp.Id;
+    $vm = Add-AzVMNetworkInterface -VM $vm -Id $nic.Id;
     $nic.DnsSettings.DnsServers.Add($DnsServer);
     $nic | Set-AzNetworkInterface
-    $vm = Add-AzVMNetworkInterface -VM $vm -Id $nic.Id;
 
     Write-Output "Creating VM $VmName";
     New-AzVM -VM $vm -ResourceGroupName $testResourceGroupName -Location $snapshot.Location;
