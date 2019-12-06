@@ -75,30 +75,31 @@ function Get-ExtensionCommand($outlookVersion){
     return $command;
 }
 
-function New-VM($vmName, $snapshotName, $ipAddress, $vnet){
-    Write-Output "Creating $vmName";
-    $diskName = "$snapshotName" +"_" +$batch + "_copy";
-    Write-Output "Getting the snapshot $snapshotName";
-    $snapshot = Get-AzSnapshot $groupName -SnapshotName $snapshotName;;
+function New-VM($VmName, $SnapshotName, $IpAddress, $Vnet, $OutlookVersion){
+    
+    Write-Output "Creating $VmName";
+    $diskName = "$SnapshotName" +"_" + $OutlookVersion + "_copy";
+    Write-Output "Getting the snapshot $SnapshotName";
+    $snapshot = Get-AzSnapshot $groupName -SnapshotName $SnapshotName;;
 
     Write-Output "Creating disk $diskName"
     $disConfig = New-AzDiskConfig -Location $snapshot.Location -SourceResourceId $snapshot.Id -CreateOption Copy;
     $disk = New-AzDisk -Disk $disConfig -ResourceGroupName $testResourceGroupName -DiskName $diskName;
 
     Write-Output "Setting the vm size to $vmSize";
-    $vm = New-AzVMConfig -VMName $vmName -VMSize $vmSize;
+    $vm = New-AzVMConfig -VMName $VmName -VMSize $vmSize;
     $vm = Set-AzVMOSDisk -VM $vm -ManagedDiskId $disk.Id -CreateOption Attach -Windows;
 
-    Write-Output "Creating network for $vmName";
-    $publicIpName = ($vmName.ToLower()+'_ip');
+    Write-Output "Creating network for $VmName";
+    $publicIpName = ($VmName.ToLower()+'_ip');
     $publicIp = New-AzPublicIpAddress -Name $publicIpName -ResourceGroupName $testResourceGroupName -Location $snapshot.Location -AllocationMethod Dynamic;
-    $privateIpName = ($vmName.ToLower()+'_pip');
-    New-AzNetworkInterfaceIpConfig -Name $privateIpName -Subnet $vnet.Subnets[0] -PrivateIpAddress $ipaddress -Primary;
-    $nicName = ($vmName.ToLower()+'_nic');
+    $privateIpName = ($VmName.ToLower()+'_pip');
+    New-AzNetworkInterfaceIpConfig -Name $privateIpName -Subnet $Vnet.Subnets[0] -PrivateIpAddress $IpAddress -Primary;
+    $nicName = ($VmName.ToLower()+'_nic');
     $nic = New-AzNetworkInterface -Name $nicName -ResourceGroupName $testResourceGroupName -Location $snapshot.Location -SubnetId $vnet.Subnets[0].Id -IpConfigurationName $privateIpName -PublicIpAddressId $publicIp.Id;
     $vm = Add-AzVMNetworkInterface -VM $vm -Id $nic.Id;
 
-    Write-Output "Creating VM $vmName";
+    Write-Output "Creating VM $VmName";
     New-AzVM -VM $vm -ResourceGroupName $testResourceGroupName -Location $snapshot.Location;
 }
 
@@ -127,9 +128,11 @@ foreach($outlookVersion in $OutlookVersions.Split(',')){
     
     Write-Output "Creating the virtual network"
     $vnet = New-AzVirtualNetwork -Name $vitrualNetworkName -ResourceGroupName $testResourceGroupName -Location $location -AddressPrefix 172.31.0.0/16 -Subnet $subnetConfig;
-
-    New-VM -vmName "dc$outlookVersion" -snapshotName $dcSnapshotName -ipAddress "172.31.11.5" -vnet $vnet;
-    New-VM -vmName "qam$outlookVersion" -snapshotName $qamSnapshotName -ipAddress "172.31.11.4" -vnet $vnet;
+    
+    $vmDcName = "dc$outlookVersion";
+    $vmQAMName = "qam$outlookVersion";
+    New-VM -VmName $vmDcName -SnapshotName $dcSnapshotName -IpAddress "172.31.11.5" -Vnet $vnet -OutlookVersion $outlookVersion;
+    New-VM -VmName $vmQAMName -SnapshotName $qamSnapshotName -IpAddress "172.31.11.4" -Vnet $vnet -OutlookVersion $outlookVersion;
 
     $command = Get-ExtensionCommand -outlookVersion $outlookVersion
     Write-Host "Start getting the startup script to install QAM"
@@ -140,7 +143,7 @@ foreach($outlookVersion in $OutlookVersions.Split(',')){
     Write-Host "Executing the extension Command: $command"
     Set-AzVMExtension -ResourceGroupName $testResourceGroupName `
         -Location $location `
-        -VMName "qam" `
+        -VMName $vmQAMName `
         -Name $extensionName `
         -Publisher "Microsoft.Compute" `
         -ExtensionType "CustomScriptExtension" `
