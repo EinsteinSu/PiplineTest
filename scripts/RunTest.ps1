@@ -42,7 +42,7 @@ param(
 if($OutlookVersions){
     $OutlookVersions.GetType()
 }
-
+Write-Host $OutlookVersions
 <#$groupName = "AutomationLabs"
 $vitrualNetworkName = "vmNetwork_" + $batch
 $vmSize = "Standard_DS3"
