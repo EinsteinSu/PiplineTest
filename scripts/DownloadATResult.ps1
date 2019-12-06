@@ -13,6 +13,6 @@ $storageAccount = Get-AzStorageAccount -Name $StorageAccountName -ResourceGroupN
 $ctx = $storageAccount.Context;
 $container = "startup"
 $Destination = $Destination + "\"
-New-Item -Path $Destination -ItemType "directory" -Name "ATTestResults" -Force
+#New-Item -Path $Destination -ItemType "directory" -Name "ATTestResults" -Force
 Write-Host "Copying $FileName to $Destination"
 Get-AzStorageBlobContent -Blob $FileName -Container $container -Destination $Destination -Context $ctx -Force
