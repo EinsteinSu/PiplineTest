@@ -39,7 +39,8 @@ param(
     [string]
     $TestResourceGroupName
 )
-$groupName = "AutomationLabs"
+Write-Host $OutlookVersions
+<#$groupName = "AutomationLabs"
 $vitrualNetworkName = "vmNetwork_" + $batch
 $vmSize = "Standard_DS3"
 $location = "WestUS"
@@ -145,7 +146,7 @@ foreach($outlookVersion in $OutlookVersions -split ','){
         -TypeHandlerVersion "1.9" `
         -Settings $settings    `
         -ProtectedSettings $protectedSettings
-}
+}#>
 
 
  
