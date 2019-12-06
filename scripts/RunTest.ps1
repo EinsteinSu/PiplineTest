@@ -116,7 +116,7 @@ if($null -eq $qamSnapshotName){
     Exit-PSSession;
 }
 
-foreach($outlookVersion in $OutlookVersions.Split(',')){
+foreach($outlookVersion in $OutlookVersions -split ','){
     $outlookVersion = $outlookVersion.Trim();
     Write-Host "Testing for Outlook $outlookVersion in $exchangeVersion $os $dbVersion";
     $securityGroup = Get-AzNetworkSecurityGroup -Name $nsgName -ResourceGroupName $groupName;
