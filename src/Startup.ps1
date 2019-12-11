@@ -43,7 +43,7 @@ param(
     $Dns,
     [Parameter(Mandatory)]
     [string]
-    $TestResourceGorupName,
+    $TestResourceGroupName,
     [ValidateSet("ExchangeOnline","SingleExchange","Groupwise")]
     [string]
     $Environment

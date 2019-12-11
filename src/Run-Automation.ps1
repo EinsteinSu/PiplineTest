@@ -98,7 +98,7 @@ function Get-ExtensionCommand($outlookVersion){
     $command += Get-ExecutionCommand -Name "AzPassword" -Value $azPassword;
     $command += Get-ExecutionCommand -Name "Environment" -Value $Environment;
     $command += Get-ExecutionCommand -Name "Dns" -Value $dnsServer;
-    $command += Get-ExecutionCommand -Name "TestResourceGorupName" -Value $TestResourceGroupName;
+    $command += Get-ExecutionCommand -Name "TestResourceGroupName" -Value $TestResourceGroupName;
     $command += Get-ExecutionCommand -Name "ResourceStorageAccountName" -Value $resourceStorageAccountName;
     $command += Get-ExecutionCommand -Name "ResourceStorageContainerName" -Value $containerName;
     return $command;
@@ -179,4 +179,8 @@ foreach($outlookVersion in $OutlookVersions.Split(',')){
         -TypeHandlerVersion "1.9" `
         -Settings $settings    `
         -ProtectedSettings $protectedSettings
+
+    $output = Get-AzureRmVMDiagnosticsExtension -ResourceGroupName $testResourceGroupName -VMName $vmQAMName -Name $extensionName -Status #-Debug
+    $text = $output.SubStatuses[0].Message
+    [regex]::Replace($text, "\\n", "`n")
 }
