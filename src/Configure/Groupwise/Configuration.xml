@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ConfigurationCache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <DirectoryServiceData>
+    <IsChanged>true</IsChanged>
+    <AdcConfigFile />
+	<LoginDomainInfos>
+	  <LoginDomainInfo>
+		  <OperationStatus>New</OperationStatus>
+		  <DomainConfig>
+			<Name>am</Name>
+			<DomainType>ADSingle</DomainType>
+			<Settings xsi:type="ActiveDirectorySingleDomainSettings">
+			  <Server>
+				<Protocol>LDAP</Protocol> 
+				<ServerType>Domain</ServerType> 
+				<Name>am.com</Name> 
+				<Port>389</Port> 
+			  </Server>
+			  <SearchBase>DC=am,DC=com</SearchBase> 
+			  <ObjectTypes>All</ObjectTypes> 
+			  <Containers />
+			  <Filters />
+			  <ImportUsersWithoutMailboxes>false</ImportUsersWithoutMailboxes>
+			</Settings>
+		  </DomainConfig>
+	  </LoginDomainInfo>
+	</LoginDomainInfos>
+  </DirectoryServiceData>
+  <EsmSettingsData>
+    <IsChanged>true</IsChanged>
+    <ExportDirectory>C:\Quest\ArchiveManager\Export</ExportDirectory>
+    <StoreManagerGroup>default</StoreManagerGroup>
+    <ServiceUserGroupName>ArchiveManagerServiceUsers</ServiceUserGroupName>
+  </EsmSettingsData>
+  <StorageLocationData>
+    <IsChanged>true</IsChanged>
+    <MessageStoredForCompliance>false</MessageStoredForCompliance>
+    <SnapLockRetentionTime />
+    <SnapLockRetentionMode />
+	<ServiceUserGroupName>ArchiveManagerServiceUsers</ServiceUserGroupName>
+    <StorageLocations>
+      <StorageLocation>
+        <StorageType>DualFileSystem</StorageType>
+        <ConnectionString>DATA=\\qam\ArchiveManagerAttachmentStore;MACHINE=qam;LOCALPATH=C:\Quest\ArchiveManager\Data</ConnectionString>
+        <Default>True</Default>
+      </StorageLocation>
+    </StorageLocations>
+  </StorageLocationData>
+  <SmtpMailServerData>
+    <IsChanged>true</IsChanged>
+    <MailServerName>DC</MailServerName>
+    <SmtpLogin />
+    <SmtpPassword />
+  </SmtpMailServerData>
+  <PhoneHomeData>
+    <IsChanged>true</IsChanged>
+    <Country>China</Country>
+    <CountryBelongEU>false</CountryBelongEU>
+    <IsParticipate>false</IsParticipate>
+  </PhoneHomeData>
+  <ServiceUserData>
+    <IsChanged>true</IsChanged>
+    <GeneralServiceUserName>am.com\ArchiveMgr_Service</GeneralServiceUserName>
+    <GeneralServicePassword>Pa$$word</GeneralServicePassword>
+    <JournalServiceUserName>am.com\ArchiveMgr_Journal</JournalServiceUserName>
+    <JournalServicePassword>Pa$$word</JournalServicePassword>
+    <ESMServiceUserName>am.com\ArchiveMgr_ESM</ESMServiceUserName>
+    <ESMServicePassword>Pa$$word</ESMServicePassword>
+    <ServiceUserGroupName>ArchiveManagerServiceUsers</ServiceUserGroupName>
+  </ServiceUserData>
+  <WebsiteData>
+    <IsChanged>true</IsChanged>
+    <AdminPassword>Pa$$word</AdminPassword>
+    <AppPoolUsername>am.com\ArchiveMgr_Service</AppPoolUsername>
+    <AppPoolPassword>Pa$$word</AppPoolPassword>
+    <MainWebsite>
+      <IsChanged>true</IsChanged>
+      <OperationStatus>New</OperationStatus>
+      <OldWebsiteName />
+      <WebsiteName>ArchiveManager</WebsiteName>
+      <HostHeader>archivemanager</HostHeader>
+      <IPAddress />
+      <Port>80</Port>
+      <FilesDirectory>C:\Program Files (x86)\Quest\Archive Manager\</FilesDirectory>
+    </MainWebsite>
+    <SecondaryWebsites />
+  </WebsiteData>
+  <BaseDirectoryData>
+    <IsChanged>true</IsChanged>
+    <FullPath>C:\Quest\ArchiveManager</FullPath>
+    <ServiceUserGroupName>ArchiveManagerServiceUsers</ServiceUserGroupName>
+  </BaseDirectoryData>
+  <ServerLogPathData>
+    <IsChanged>true</IsChanged>
+    <FullPath>C:\Quest\ArchiveManager\Logs\</FullPath>
+    <ServiceUserGroupName>ArchiveManagerServiceUsers</ServiceUserGroupName>
+  </ServerLogPathData>
+  <OutlookFormData>
+    <IsChanged>false</IsChanged>
+    <Install>false</Install>
+    <OutlookFormFilePath />
+    <MailServerInfos />
+  </OutlookFormData>
+  <DefaultPolicyData>
+    <IsChanged>true</IsChanged>
+    <IsCreateDefaultPolicy>true</IsCreateDefaultPolicy>
+    <MailServers>
+      <MailServerInfo>
+        <Name>DC</Name>
+        <Type>Exchange</Type>
+        <Version>2019</Version>
+        <ServerDN />
+        <Domain>am.com</Domain>
+        <UseProxy>false</UseProxy>
+        <ProxyUsername />
+        <ProxyPassword />
+        <DelegateEmailAddress />
+        <DomainConfig />
+      </MailServerInfo>
+    </MailServers>
+  </DefaultPolicyData>
+  <FTIConfigData>
+    <IsChanged>true</IsChanged>
+    <IsConfig>true</IsConfig>
+    <DriveList>
+      <string>C:</string>
+    </DriveList>
+  </FTIConfigData>
+</ConfigurationCache>

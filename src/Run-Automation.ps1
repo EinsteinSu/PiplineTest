@@ -180,7 +180,7 @@ foreach($outlookVersion in $OutlookVersions.Split(',')){
         -Settings $settings    `
         -ProtectedSettings $protectedSettings
 
-    $output = Get-AzureRmVMDiagnosticsExtension -ResourceGroupName $testResourceGroupName -VMName $vmQAMName -Name $extensionName -Status #-Debug
+    $output = Get-AzVMDiagnosticsExtension -ResourceGroupName $testResourceGroupName -VMName $vmQAMName -Name $extensionName -Status #-Debug
     $text = $output.SubStatuses[0].Message
     [regex]::Replace($text, "\\n", "`n")
 }

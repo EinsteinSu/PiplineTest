@@ -5,7 +5,7 @@
     [string]
     $tags = [string]::Empty)
 
-$basePath = "C:\AT";
+$basePath = "C:\AutomationTest";
 $global:testPath = [string]::Empty;
 $global:testResult = [string]::Empty;
 
@@ -33,7 +33,7 @@ Function Initial-TestPathes {
     $global:testResult = [System.IO.Path]::Combine($global:testPath, "Results");
     If (!(Test-Path $global:testResult)) {
         Write-Host "Creating Results folder..." -ForegroundColor Green;
-        mkdir $global:testResult;
+        mkdir $global:testResult | Out-Null;
     }
 
     $global:testResult = [System.IO.Path]::Combine($global:testResult, [string]::Format("{0}{1}", $component, "Result.xml"));

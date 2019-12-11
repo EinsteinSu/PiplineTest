@@ -44,6 +44,9 @@ param(
     [Parameter(Mandatory)]
     [string]
     $TestResourceGroupName,
+    [Parameter(Mandatory)]
+    [string]
+    $ResourceStorageAccountName,
     [ValidateSet("ExchangeOnline","SingleExchange","Groupwise")]
     [string]
     $Environment
@@ -65,12 +68,13 @@ $container = "startup"
 $installationFolder = "C:\Installer\";
 New-Item -Path "C:\" -ItemType "directory" -Name "Installer" -Force
 Get-AzStorageBlobContent -Blob "license.asc" -Container $container -Destination $installationFolder -Context $ctx -Force
-#copy the config file to C:\Installer
 
 
-#import modules
+$baseFolder = "C:\AutomationTest"
+Write-Host "Import modules"
 Import-Module AZ
-Import-Module C:\Installer\Installer.psd1
+Import-Module C:\AutomationTest\Modules\Installer\Installer.psd1 -Force;
+
 
 function Write-ExecutionLog($Result, $ExecutionName){
     if($Result.ExitCode -eq 0){
@@ -78,7 +82,8 @@ function Write-ExecutionLog($Result, $ExecutionName){
     }else{
         $items = Get-ChildItem -Path $Result.LogPath
         foreach($item in $items){
-            Get-Content -Path $item.FullName
+            $text = Get-Content -Path $item.FullName
+            Write-Host $text
         }
     }
 }
@@ -90,16 +95,19 @@ $result = Install-ArchiveManager -Version $QamInstallerVersion -Branch $Branch -
 Write-ExecutionLog -Result $result -ExecutionName "Quest Archive Manager"
 
 
-$configFile = $installationFolder + "Configuration.xml"
+$configFile = "$baseFolder\Configure\$Environment\Configuration.xml"
 $licenseFile = $installationFolder + "license.asc"
+Write-Host "Configure QAM with file $configFile $licenseFile"
 $result = Config-ArchiveManager -ConfigurationFile $configFile -LicenseFile $licenseFile
 Write-ExecutionLog -Result $result -ExecutionName "Configure Quest Archive Manager"
 
-
-$atFolder = "C:\AT\"
-New-Item -Path "C:\" -ItemType "directory" -Name "AT" -Force
-Get-AzStorageBlob -Container "automationtest" -Context $ctx | Get-AzStorageBlobContent -Destination $atFolder -Force
-
-$result = C:\AT\Run-Test.ps1
+$result = C:\AutomationTest\Run-Test.ps1
 Write-Host "Get the test result file $result"
-Set-AzStorageBlobContent -File $result -Container "startup" -Blob "testresult.xml" -Context $ctx -Force
+
+$resourceStorageAccount = Get-AzStorageAccount -ResourceGroupName $TestResourceGroupName `
+                                -Name $ResourceStorageAccountName
+
+$testStorageContext = $resourceStorageAccount.Context;
+$containerName = "testresult";
+New-AzStorageContainer -Name $containerName -Context $testStorageContext -Permission blob;
+Set-AzStorageBlobContent -File $result -Container $containerName -Blob "testresult.xml" -Context $testStorageContext -Force
