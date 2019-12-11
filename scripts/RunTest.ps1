@@ -55,6 +55,8 @@ $exchangeVersion = "Ex2019_CU3";
 $os = "Win2019"
 $dbVersion = "SQL2014"
 $storageConnection = "DefaultEndpointsProtocol=https;AccountName=$storageAccountName;AccountKey=$storageKey;EndpointSuffix=core.windows.net";
+
+
 $resourceStorageAccountName = "$TestResourceGroupName".ToLower() + "storages";
 $resourceStorageAccount = New-AzStorageAccount -ResourceGroupName $TestResourceGroupName `
                                 -Name $resourceStorageAccountName `
@@ -67,7 +69,7 @@ New-AzStorageContainer -Name $containerName -Context $ctx -Permission blob;
 Write-Host "Uploading file from $ResourcePath to $resourceStorageAccount - $containerName";
 Get-ChildItem -File $ResourcePath -Recurse | Set-AzStorageBlobContent -Context $ctx -Container $containerName;
 
-<#function Get-ExecutionCommand($Name, $Value){
+function Get-ExecutionCommand($Name, $Value){
     if([String]::IsNullOrEmpty($Value)){
         return "";
     }
@@ -168,7 +170,7 @@ foreach($outlookVersion in $OutlookVersions.Split(',')){
         -TypeHandlerVersion "1.9" `
         -Settings $settings    `
         -ProtectedSettings $protectedSettings
-}#>
+}
 
 
  
