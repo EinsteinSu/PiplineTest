@@ -43,25 +43,29 @@ param(
     $Environment,
     [Parameter(Mandatory)]
     [string]
-    $ResourcePath
+    $ResourcePath,
+    [Parameter(Mandatory)]
+    [string]
+    $Location
 )
 
 $groupName = "AutomationLabs"
 
 $vmSize = "Standard_DS3"
-$location = "WestUS"
+
 $nsgName = "dc-nsg"
 $exchangeVersion = "Ex2019_CU3";
 $os = "Win2019"
 $dbVersion = "SQL2014"
 $storageConnection = "DefaultEndpointsProtocol=https;AccountName=$storageAccountName;AccountKey=$storageKey;EndpointSuffix=core.windows.net";
-
+$dnsServer = "172.31.11.4";
+$qamSerer = "172.31.11.5";
 
 $resourceStorageAccountName = "$TestResourceGroupName".ToLower() + "storages";
 $resourceStorageAccount = New-AzStorageAccount -ResourceGroupName $TestResourceGroupName `
                                 -Name $resourceStorageAccountName `
                                 -SkuName Standard_LRS `
-                                -Location $location;
+                                -Location $Location;
 $ctx = $resourceStorageAccount.Context;
 $containerName = "resources";
 New-AzStorageContainer -Name $containerName -Context $ctx -Permission blob;
@@ -78,7 +82,7 @@ function Get-ExecutionCommand($Name, $Value){
 }
 
 function Get-ExtensionCommand($outlookVersion){
-    $command = "powershell -ExecutionPolicy Unrestricted -File startup.ps1 ";
+    $command = "powershell -ExecutionPolicy Unrestricted -File run-startup.ps1 ";
     $command += Get-ExecutionCommand -Name "StorageAccountName" -Value $storageAccountName;
     $command += Get-ExecutionCommand -Name "StorageKey" -Value $storageKey;
     $command += Get-ExecutionCommand -Name "StorageConnection" -Value $storageConnection;
@@ -92,6 +96,11 @@ function Get-ExtensionCommand($outlookVersion){
     $command += Get-ExecutionCommand -Name "InstallFeatures" -Value $installFeatures;
     $command += Get-ExecutionCommand -Name "AzAccount" -Value $azAccount;
     $command += Get-ExecutionCommand -Name "AzPassword" -Value $azPassword;
+    $command += Get-ExtensionCommand -Name "Environment" -Value $Environment;
+    $command += Get-ExtensionCommand -Name "Dns" -Value $dnsServer;
+    $command += Get-ExtensionCommand -Name "TestResourceGorupName" -Value $TestResourceGroupName;
+    $command += Get-ExtensionCommand -Name "ResourceStorageAccountName" -Value $resourceStorageAccountName;
+    $command += Get-ExtensionCommand -Name "ResourceStorageContainerName" -Value $containerName;
     return $command;
 }
 
@@ -147,22 +156,22 @@ foreach($outlookVersion in $OutlookVersions.Split(',')){
      
     $vitrualNetworkName = "vmNetwork_$outlookVersion";
     Write-Output "Creating the virtual network $vitrualNetworkName"
-    $vnet = New-AzVirtualNetwork -Name $vitrualNetworkName -ResourceGroupName $testResourceGroupName -Location $location -AddressPrefix 172.31.0.0/16 -Subnet $subnetConfig;
+    $vnet = New-AzVirtualNetwork -Name $vitrualNetworkName -ResourceGroupName $testResourceGroupName -Location $Location -AddressPrefix 172.31.0.0/16 -Subnet $subnetConfig;
 
     $vmDcName = "dc$outlookVersion";
     $vmQAMName = "qam$outlookVersion";
-    New-VM -VmName $vmDcName -SnapshotName $dcSnapshotName -IpAddress "172.31.11.4" -Vnet $vnet -OutlookVersion $outlookVersion;
-    New-VM -VmName $vmQAMName -SnapshotName $qamSnapshotName -IpAddress "172.31.11.5" -Vnet $vnet -OutlookVersion $outlookVersion;
+    New-VM -VmName $vmDcName -SnapshotName $dcSnapshotName -IpAddress $dnsServer -Vnet $vnet -OutlookVersion $outlookVersion;
+    New-VM -VmName $vmQAMName -SnapshotName $qamSnapshotName -IpAddress $qamSerer -Vnet $vnet -OutlookVersion $outlookVersion;
 
     $command = Get-ExtensionCommand -outlookVersion $outlookVersion
     Write-Host "Start getting the startup script to install QAM"
-    $fileUri = @("https://automationadmin.blob.core.windows.net/startup/startup.ps1")
+    $fileUri = @("https://automationadmin.blob.core.windows.net/startup/Run-Startup.ps1")
     $settings = @{"fileUris" = $fileUri};
     $protectedSettings = @{"storageAccountName" = $storageAccountName; "storageAccountKey" = $storageKey; "commandToExecute" = $command};
     $extensionName ="InstallQAMFor$outlookVersion";
     Write-Host "Executing the extension Command: $command"
     Set-AzVMExtension -ResourceGroupName $testResourceGroupName `
-        -Location $location `
+        -Location $Location `
         -VMName $vmQAMName `
         -Name $extensionName `
         -Publisher "Microsoft.Compute" `
@@ -171,12 +180,3 @@ foreach($outlookVersion in $OutlookVersions.Split(',')){
         -Settings $settings    `
         -ProtectedSettings $protectedSettings
 }
-
-
- 
-
-
-
-
-
-
