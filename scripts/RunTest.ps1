@@ -26,7 +26,7 @@ param(
     [Parameter()]
     [string]
     $ArtPassword,
-    [Parameter()]
+    [ValidateSet("ADC", "ESM", "MAPIDL", "FTI", "FTS", "GDC", "GSM", "Retention", "Alert", "")]
     [string]
     $TestComponent,
     [Parameter()]
@@ -37,7 +37,13 @@ param(
     $InstallFeatures,
     [Parameter()]
     [string]
-    $TestResourceGroupName
+    $TestResourceGroupName,
+    [ValidateSet("ExchangeOnline","SingleExchange","Groupwise")]
+    [string]
+    $Environment,
+    [Parameter(Mandatory)]
+    [string]
+    $ResourcePath
 )
 
 $groupName = "AutomationLabs"
@@ -49,7 +55,18 @@ $exchangeVersion = "Ex2019_CU3";
 $os = "Win2019"
 $dbVersion = "SQL2014"
 $storageConnection = "DefaultEndpointsProtocol=https;AccountName=$storageAccountName;AccountKey=$storageKey;EndpointSuffix=core.windows.net";
-function Get-ExecutionCommand($Name, $Value){
+$resourceStorageAccount = New-AzStorageAccount -ResourceGroupName $TestResourceGroupName `
+                                -Name "mystorageaccount" `
+                                -SkuName Standard_LRS `
+                                -Location $location 
+$ctx = $resourceStorageAccount.Context
+$containerName = "resources"
+New-AzStorageContainer -Name $containerName -Context $ctx -Permission blob
+
+Write-Host "Uploading file from $ResourcePath to $resourceStorageAccount - $containerName"
+Get-ChildItem -File $ResourcePath -Recurse | Set-AzStorageBlobContent -Container $containerName 
+
+<#function Get-ExecutionCommand($Name, $Value){
     if([String]::IsNullOrEmpty($Value)){
         return "";
     }
@@ -150,7 +167,7 @@ foreach($outlookVersion in $OutlookVersions.Split(',')){
         -TypeHandlerVersion "1.9" `
         -Settings $settings    `
         -ProtectedSettings $protectedSettings
-}
+}#>
 
 
  
