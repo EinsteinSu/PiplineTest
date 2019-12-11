@@ -96,11 +96,11 @@ function Get-ExtensionCommand($outlookVersion){
     $command += Get-ExecutionCommand -Name "InstallFeatures" -Value $installFeatures;
     $command += Get-ExecutionCommand -Name "AzAccount" -Value $azAccount;
     $command += Get-ExecutionCommand -Name "AzPassword" -Value $azPassword;
-    $command += Get-ExtensionCommand -Name "Environment" -Value $Environment;
-    $command += Get-ExtensionCommand -Name "Dns" -Value $dnsServer;
-    $command += Get-ExtensionCommand -Name "TestResourceGorupName" -Value $TestResourceGroupName;
-    $command += Get-ExtensionCommand -Name "ResourceStorageAccountName" -Value $resourceStorageAccountName;
-    $command += Get-ExtensionCommand -Name "ResourceStorageContainerName" -Value $containerName;
+    $command += Get-ExecutionCommand -Name "Environment" -Value $Environment;
+    $command += Get-ExecutionCommand -Name "Dns" -Value $dnsServer;
+    $command += Get-ExecutionCommand -Name "TestResourceGorupName" -Value $TestResourceGroupName;
+    $command += Get-ExecutionCommand -Name "ResourceStorageAccountName" -Value $resourceStorageAccountName;
+    $command += Get-ExecutionCommand -Name "ResourceStorageContainerName" -Value $containerName;
     return $command;
 }
 
