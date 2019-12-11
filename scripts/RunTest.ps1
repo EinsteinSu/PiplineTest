@@ -65,7 +65,7 @@ $containerName = "resources";
 New-AzStorageContainer -Name $containerName -Context $ctx -Permission blob;
 
 Write-Host "Uploading file from $ResourcePath to $resourceStorageAccount - $containerName";
-Get-ChildItem -File $ResourcePath -Recurse | Set-AzStorageBlobContent -Container $containerName;
+Get-ChildItem -File $ResourcePath -Recurse | Set-AzStorageBlobContent -Context $ctx -Container $containerName;
 
 <#function Get-ExecutionCommand($Name, $Value){
     if([String]::IsNullOrEmpty($Value)){
