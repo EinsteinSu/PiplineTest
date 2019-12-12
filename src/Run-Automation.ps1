@@ -46,29 +46,36 @@ param(
     $ResourcePath,
     [Parameter(Mandatory)]
     [string]
-    $Location
+    $Location,
+    [Parameter(Mandatory)]
+    [string]
+    $DCTag,
+    [Parameter(Mandatory)]
+    [string]
+    $QAMTag,
+    [Parameter(Mandatory)]
+    [string]
+    $VMSize
 )
 
 $groupName = "AutomationLabs"
-
-$vmSize = "Standard_DS3"
-
 $nsgName = "dc-nsg"
-$exchangeVersion = "Ex2019_CU3";
-$os = "Win2019"
-$dbVersion = "SQL2014"
 $storageConnection = "DefaultEndpointsProtocol=https;AccountName=$storageAccountName;AccountKey=$storageKey;EndpointSuffix=core.windows.net";
 $dnsServer = "172.31.11.4";
 $qamSerer = "172.31.11.5";
 
 $resourceStorageAccountName = "$TestResourceGroupName".ToLower() + "storages";
+Write-Host "Creating azure storage $resourceStorageAccountName";
 $resourceStorageAccount = New-AzStorageAccount -ResourceGroupName $TestResourceGroupName `
                                 -Name $resourceStorageAccountName `
                                 -SkuName Standard_LRS `
                                 -Location $Location;
 $ctx = $resourceStorageAccount.Context;
 $containerName = "resources";
+Write-Host "Creating Container $containerName";
 New-AzStorageContainer -Name $containerName -Context $ctx -Permission blob;
+$testResultContainer = "testresult";
+New-AzStorageContainer -Name $testResultContainer -Context $ctx -Permission blob;
 
 Write-Host "Uploading file from $ResourcePath to $resourceStorageAccount - $containerName";
 Get-ChildItem -File $ResourcePath -Recurse | Set-AzStorageBlobContent -Context $ctx -Container $containerName;
@@ -81,12 +88,12 @@ function Get-ExecutionCommand($Name, $Value){
     return "-$Name $Value ";
 }
 
-function Get-ExtensionCommand($outlookVersion){
+function Get-ExtensionCommand($OutlookVersion){
     $command = "powershell -ExecutionPolicy Unrestricted -File run-startup.ps1 ";
     $command += Get-ExecutionCommand -Name "StorageAccountName" -Value $storageAccountName;
     $command += Get-ExecutionCommand -Name "StorageKey" -Value $storageKey;
     $command += Get-ExecutionCommand -Name "StorageConnection" -Value $storageConnection;
-    $command += Get-ExecutionCommand -Name "OutlookVersion" -Value $outlookVersion;
+    $command += Get-ExecutionCommand -Name "OutlookVersion" -Value $OutlookVersion;
     $command += Get-ExecutionCommand -Name "QamInstallerVersion" -Value $qamInstallerVersion;
     $command += Get-ExecutionCommand -Name "Branch" -Value $branch;
     $command += Get-ExecutionCommand -Name "ArtUserName" -Value $artUserName;
@@ -115,8 +122,8 @@ function New-VM($VmName, $SnapshotName, $IpAddress, $Vnet, $OutlookVersion){
     $disConfig = New-AzDiskConfig -Location $snapshot.Location -SourceResourceId $snapshot.Id -CreateOption Copy;
     $disk = New-AzDisk -Disk $disConfig -ResourceGroupName $testResourceGroupName -DiskName $diskName;
 
-    Write-Output "Setting the vm size to $vmSize";
-    $vm = New-AzVMConfig -VMName $VmName -VMSize $vmSize;
+    Write-Output "Setting the vm size to $VMSize";
+    $vm = New-AzVMConfig -VMName $VmName -VMSize $VMSize;
     $vm = Set-AzVMOSDisk -VM $vm -ManagedDiskId $disk.Id -CreateOption Attach -Windows;
 
     Write-Output "Creating network for $VmName";
@@ -134,13 +141,13 @@ function New-VM($VmName, $SnapshotName, $IpAddress, $Vnet, $OutlookVersion){
 
 
 
-$tags = [ordered]@{Type = "DC";  ExchangeVersion = $exchangeVersion; OS = $os}
+$tags = { Config = $DCTag };
 $dcSnapshotName = (Get-AzResource -Tag $tags)[0].Name;
 if($null -eq $dcSnapshotName){
     Write-Error "Can not found snapshot for DC";
     Exit-PSSession;
 }
-$tags = [ordered]@{Type = "QAM"; DbVersion = $dbVersion ; OS = $os;}
+$tags = { Config = $QAMTag };
 $qamSnapshotName = (Get-AzResource -Tag $tags)[0].Name;
 if($null -eq $qamSnapshotName){
     Write-Error "Can not found snapshot for QAM";
@@ -155,7 +162,7 @@ foreach($outlookVersion in $OutlookVersions.Split(',')){
     $subnetConfig = New-AzVirtualNetworkSubnetConfig -Name $subnetConfigName -AddressPrefix 172.31.11.0/24 -NetworkSecurityGroup $securityGroup;
      
     $vitrualNetworkName = "vmNetwork_$outlookVersion";
-    Write-Output "Creating the virtual network $vitrualNetworkName"
+    Write-Output "Creating the virtual network $vitrualNetworkName";
     $vnet = New-AzVirtualNetwork -Name $vitrualNetworkName -ResourceGroupName $testResourceGroupName -Location $Location -AddressPrefix 172.31.0.0/16 -Subnet $subnetConfig;
 
     $vmDcName = "dc$outlookVersion";
