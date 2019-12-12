@@ -141,14 +141,14 @@ function New-VM($VmName, $SnapshotName, $IpAddress, $Vnet, $OutlookVersion){
 
 
 
-$tags = { Config = $DCTag };
-$dcSnapshotName = (Get-AzResource -Tag $tags)[0].Name;
+$tags = @{ Config = $DCTag };
+$dcSnapshotName = (Get-AzResource -Tag $tags).Name;
 if($null -eq $dcSnapshotName){
     Write-Error "Can not found snapshot for DC";
     Exit-PSSession;
 }
-$tags = { Config = $QAMTag };
-$qamSnapshotName = (Get-AzResource -Tag $tags)[0].Name;
+$tags = @{ Config = $QAMTag };
+$qamSnapshotName = (Get-AzResource -Tag $tags).Name;
 if($null -eq $qamSnapshotName){
     Write-Error "Can not found snapshot for QAM";
     Exit-PSSession;
