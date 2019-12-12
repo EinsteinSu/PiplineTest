@@ -12,4 +12,4 @@ Write-Host "Downloading test result files from $testResultContainer to $Destinat
 $resourceStorageAccount = Get-AzStorageAccount -ResourceGroupName $TestResourceGroupName `
                                 -Name $resourceStorageAccountName
 $ctx = $resourceStorageAccount.Context;
-Get-AzStorageBlob -Container $testResultContainer -Context $ctx | Get-AzStorageBlobContent -Destination $Destination -Force
+Get-AzStorageBlob -Container $testResultContainer -Context $ctx | Get-AzStorageBlobContent -Destination $Destination -Force;
