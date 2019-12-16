@@ -86,6 +86,7 @@ Set-Location -Path $baseFolder
             -InstallFeatures $InstallFeatures `
             -Dns $Dns `
             -TestResourceGroupName $TestResourceGroupName `
+            -ResourceStorageAccountName $ResourceStorageAccountName `
             -Environment $Environment `
             -Tenant $Tenant `
             -TestResultContainerName $TestResultContainerName `
