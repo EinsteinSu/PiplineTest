@@ -63,7 +63,7 @@ Write-Host "Logging in to Azure";
 $cred =  New-Object System.Management.Automation.PSCredential ($AzAccount,(ConvertTo-SecureString $AzPassword -AsPlainText -Force)) 
 Connect-AzAccount -ServicePrincipal -Tenant $Tenant -Credential $cred
 
-Write-Host "Downloading resource files from $ResourcesContainerName to $baseFolder."
+Write-Host "Downloading resource files from $ResourcesContainerName to $baseFolder"
 $resourceStorageAccount = Get-AzStorageAccount -ResourceGroupName $TestResourceGroupName `
                                 -Name $ResourceStorageAccountName
 
