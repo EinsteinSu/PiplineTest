@@ -1,41 +1,33 @@
 param(
-	[Parameter()]
+	[Parameter(Mandatory)]
     [string]
     $AzAccount,
-	[Parameter()]
+	[Parameter(Mandatory)]
     [string]
     $AzPassword,
-    [Parameter()]
+    [Parameter(Mandatory)]
     [string]
     $StorageAccountName,
-    [Parameter()]
+    [Parameter(Mandatory)]
     [string]
     $StorageKey,
-    [Parameter()]
     [string]
     $OutlookVersions,
-    [Parameter()]
     [string]
-    $QamInstallerVersion,
-    [Parameter()]
+    $QamVersion,
     [string]
     $Branch,
-    [Parameter()]
     [string]
     $ArtUserName,
-    [Parameter()]
     [string]
     $ArtPassword,
     [ValidateSet("ADC", "ESM", "MAPIDL", "FTI", "FTS", "GDC", "GSM", "Retention", "Alert", "")]
     [string]
     $TestComponent,
-    [Parameter()]
     [string]
     $TestTags,
-    [Parameter()]
     [string]
     $InstallFeatures,
-    [Parameter()]
     [string]
     $TestResourceGroupName,
     [ValidateSet("ExchangeOnline","SingleExchange","Groupwise")]
@@ -55,30 +47,45 @@ param(
     $QAMTag,
     [Parameter(Mandatory)]
     [string]
-    $VMSize
+    $VMSize,
+    [Parameter(Mandatory)]
+    [string]
+    $Tenant,
+    [Parameter(Mandatory)]
+    [string]
+    $DnsServerAddress,
+    [Parameter(Mandatory)]
+    [string]
+    $QamServerAddress,
+    [Parameter(Mandatory)]
+    [string]
+    $ResourcesContainerName,
+    [Parameter(Mandatory)]
+    [string]
+    $TestResultContainerName
 )
+$ErrorActionPreference = "Stop"
 
-$groupName = "AutomationLabs"
-$nsgName = "dc-nsg"
+$groupName = "AutomationLabs";
+$nsgName = "dc-nsg";
 $storageConnection = "DefaultEndpointsProtocol=https;AccountName=$storageAccountName;AccountKey=$storageKey;EndpointSuffix=core.windows.net";
-$dnsServer = "172.31.11.4";
-$qamSerer = "172.31.11.5";
 
-$resourceStorageAccountName = "$TestResourceGroupName".ToLower() + "storages";
+
+$resourceStorageAccountName = $TestResourceGroupName.ToLower() + "storages";
 Write-Host "Creating azure storage $resourceStorageAccountName";
 $resourceStorageAccount = New-AzStorageAccount -ResourceGroupName $TestResourceGroupName `
                                 -Name $resourceStorageAccountName `
                                 -SkuName Standard_LRS `
                                 -Location $Location;
 $ctx = $resourceStorageAccount.Context;
-$containerName = "resources";
-Write-Host "Creating Container $containerName";
-New-AzStorageContainer -Name $containerName -Context $ctx -Permission blob;
-$testResultContainer = "testresult";
-New-AzStorageContainer -Name $testResultContainer -Context $ctx -Permission blob;
 
-Write-Host "Uploading file from $ResourcePath to $resourceStorageAccount - $containerName";
-Get-ChildItem -File $ResourcePath -Recurse | Set-AzStorageBlobContent -Context $ctx -Container $containerName;
+Write-Host "Creating Container $ResourcesContainerName";
+New-AzStorageContainer -Name $ResourcesContainerName -Context $ctx -Permission blob;
+
+New-AzStorageContainer -Name $TestResultContainerName -Context $ctx -Permission blob;
+$ResourcePath = [System.IO.Path]::Combine($ResourcePath, "src")
+Write-Host "Uploading file from $ResourcePath to $resourceStorageAccount - $ResourcesContainerName";
+Get-ChildItem -File $ResourcePath -Recurse | Set-AzStorageBlobContent -Context $ctx -Container $ResourcesContainerName;
 
 function Get-ExecutionCommand($Name, $Value){
     if([String]::IsNullOrEmpty($Value)){
@@ -90,24 +97,26 @@ function Get-ExecutionCommand($Name, $Value){
 
 function Get-ExtensionCommand($OutlookVersion){
     $command = "powershell -ExecutionPolicy Unrestricted -File run-startup.ps1 ";
-    $command += Get-ExecutionCommand -Name "StorageAccountName" -Value $storageAccountName;
-    $command += Get-ExecutionCommand -Name "StorageKey" -Value $storageKey;
-    $command += Get-ExecutionCommand -Name "StorageConnection" -Value $storageConnection;
+    $command += Get-ExecutionCommand -Name "StorageAccountName" -Value $StorageAccountName;
+    $command += Get-ExecutionCommand -Name "StorageKey" -Value $StorageKey;
+    $command += Get-ExecutionCommand -Name "StorageConnection" -Value $StorageConnection;
     $command += Get-ExecutionCommand -Name "OutlookVersion" -Value $OutlookVersion;
-    $command += Get-ExecutionCommand -Name "QamInstallerVersion" -Value $qamInstallerVersion;
+    $command += Get-ExecutionCommand -Name "QamVersion" -Value $QamVersion;
     $command += Get-ExecutionCommand -Name "Branch" -Value $branch;
-    $command += Get-ExecutionCommand -Name "ArtUserName" -Value $artUserName;
-    $command += Get-ExecutionCommand -Name "ArtPassword" -Value $artPassword;
-    $command += Get-ExecutionCommand -Name "TestComponent" -Value $testComponent;
-    $command += Get-ExecutionCommand -Name "TestTags" -Value $testTags;
-    $command += Get-ExecutionCommand -Name "InstallFeatures" -Value $installFeatures;
-    $command += Get-ExecutionCommand -Name "AzAccount" -Value $azAccount;
-    $command += Get-ExecutionCommand -Name "AzPassword" -Value $azPassword;
+    $command += Get-ExecutionCommand -Name "ArtUserName" -Value $ArtUserName;
+    $command += Get-ExecutionCommand -Name "ArtPassword" -Value $ArtPassword;
+    $command += Get-ExecutionCommand -Name "TestComponent" -Value $TestComponent;
+    $command += Get-ExecutionCommand -Name "TestTags" -Value $TestTags;
+    $command += Get-ExecutionCommand -Name "InstallFeatures" -Value $InstallFeatures;
+    $command += Get-ExecutionCommand -Name "AzAccount" -Value $AzAccount;
+    $command += Get-ExecutionCommand -Name "AzPassword" -Value $AzPassword;
     $command += Get-ExecutionCommand -Name "Environment" -Value $Environment;
-    $command += Get-ExecutionCommand -Name "Dns" -Value $dnsServer;
+    $command += Get-ExecutionCommand -Name "Tenant" -Value $Tenant;
+    $command += Get-ExecutionCommand -Name "Dns" -Value $DnsServerAddress;
     $command += Get-ExecutionCommand -Name "TestResourceGroupName" -Value $TestResourceGroupName;
-    $command += Get-ExecutionCommand -Name "ResourceStorageAccountName" -Value $resourceStorageAccountName;
-    $command += Get-ExecutionCommand -Name "ResourceStorageContainerName" -Value $containerName;
+    $command += Get-ExecutionCommand -Name "ResourceStorageAccountName" -Value $ResourceStorageAccountName;
+    $command += Get-ExecutionCommand -Name "ResourcesContainerName" -Value $ResourcesContainerName;
+    $command += Get-ExecutionCommand -Name "TestResultContainerName" -Value $TestResultContainerName;
     return $command;
 }
 
@@ -167,8 +176,8 @@ foreach($outlookVersion in $OutlookVersions.Split(',')){
 
     $vmDcName = "dc$outlookVersion";
     $vmQAMName = "qam$outlookVersion";
-    New-VM -VmName $vmDcName -SnapshotName $dcSnapshotName -IpAddress $dnsServer -Vnet $vnet -OutlookVersion $outlookVersion;
-    New-VM -VmName $vmQAMName -SnapshotName $qamSnapshotName -IpAddress $qamSerer -Vnet $vnet -OutlookVersion $outlookVersion;
+    New-VM -VmName $vmDcName -SnapshotName $dcSnapshotName -IpAddress $dnsServerAddress -Vnet $vnet -OutlookVersion $outlookVersion;
+    New-VM -VmName $vmQAMName -SnapshotName $qamSnapshotName -IpAddress $QamServerAddress -Vnet $vnet -OutlookVersion $outlookVersion;
 
     $command = Get-ExtensionCommand -outlookVersion $outlookVersion
     Write-Host "Start getting the startup script to install QAM"

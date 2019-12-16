@@ -4,12 +4,15 @@ param(
     $TestResourceGroupName,
     [Parameter(Mandatory)]
     [string]
-    $Destination
+    $Destination,
+    [Parameter(Mandatory)]
+    [string]
+    $TestResultContainerName
 )
+
 $resourceStorageAccountName = "$TestResourceGroupName".ToLower() + "storages";
-$testResultContainer = "testresult";
-Write-Host "Downloading test result files from $testResultContainer to $Destination"
+Write-Host "Downloading test result files from $TestResultContainerName to $Destination"
 $resourceStorageAccount = Get-AzStorageAccount -ResourceGroupName $TestResourceGroupName `
                                 -Name $resourceStorageAccountName
 $ctx = $resourceStorageAccount.Context;
-Get-AzStorageBlob -Container $testResultContainer -Context $ctx | Get-AzStorageBlobContent -Destination $Destination -Force;
+Get-AzStorageBlob -Container $TestResultContainerName -Context $ctx | Get-AzStorageBlobContent -Destination $Destination -Force;

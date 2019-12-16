@@ -3,9 +3,10 @@
     [string]
     $component = [string]::Empty,
     [string]
-    $tags = [string]::Empty)
-
-$basePath = "C:\AutomationTest";
+    $tags = [string]::Empty,
+    [string]
+    $basePath = "C:\AutomationTest"    
+    )
 $global:testPath = [string]::Empty;
 $global:testResult = [string]::Empty;
 

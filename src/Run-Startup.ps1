@@ -1,83 +1,83 @@
 param(
-	[Parameter()]
+    [Parameter(Mandatory)]
     [string]
     $AzAccount,
-	[Parameter()]
+    [Parameter(Mandatory)]
     [string]
     $AzPassword,
-    [Parameter()]
+    [Parameter(Mandatory)]
     [string]
     $StorageAccountName,
-    [Parameter()]
+    [Parameter(Mandatory)]
     [string]
     $StorageKey,
-    [Parameter()]
     [string]
     $StorageConnection,
-    [Parameter()]
+	[Parameter(Mandatory)]
     [string]
     $OutlookVersion,
-    [Parameter()]
+	[Parameter(Mandatory)]
     [string]
-    $QamInstallerVersion,
-    [Parameter()]
+    $QamVersion,
+	[Parameter(Mandatory)]
     [string]
     $Branch,
-    [Parameter()]
+	[Parameter(Mandatory)]
     [string]
     $ArtUserName,
-    [Parameter()]
+	[Parameter(Mandatory)]
     [string]
     $ArtPassword,
-    [Parameter()]
     [string]
     $TestComponent,
-    [Parameter()]
     [string]
     $TestTags,
-    [Parameter()]
     [string]
     $InstallFeatures,
     [ValidateSet("ExchangeOnline","SingleExchange","Groupwise")]
     [string]
     $Environment,
-    [Parameter()]
     [string]
     $Dns,
-    [Parameter()]
     [string]
-    $TestResourceGorupName,
+    [Parameter(Mandatory)]
+	$TestResourceGroupName,
     [Parameter(Mandatory)]
     [string]
     $ResourceStorageAccountName,
     [Parameter(Mandatory)]
     [string]
-    $ResourceStorageContainerName
+    $ResourcesContainerName,
+    [Parameter(Mandatory)]
+    [string]
+    $Tenant,
+    [Parameter(Mandatory)]
+    [string]
+    $TestResultContainerName
 )
 
+$baseFolder = "C:\AutomationTest\"
+New-Item -Path $baseFolder -ItemType "directory" -Force
 
-Write-Host "Logging in to Azure"
-$tenant = "91c369b5-1c9e-439c-989c-1867ec606603";
+Write-Host "Logging in to Azure";
 $cred =  New-Object System.Management.Automation.PSCredential ($AzAccount,(ConvertTo-SecureString $AzPassword -AsPlainText -Force)) 
-Connect-AzAccount -ServicePrincipal -Tenant $tenant -Credential $cred
+Connect-AzAccount -ServicePrincipal -Tenant $Tenant -Credential $cred
 
-New-Item -Path "C:\" -ItemType "directory" -Name "AutomationTest" -Force
-$baseFolder = "C:\AutomationTest"
-
-Write-Host "Downloading resource files from $ResourceStorageContainerName to $baseFolder"
+Write-Host "Downloading resource files from $ResourcesContainerName to $baseFolder."
 $resourceStorageAccount = Get-AzStorageAccount -ResourceGroupName $TestResourceGroupName `
-                                -Name $ResourceStorageAccountName `
+                                -Name $ResourceStorageAccountName
 
 $ctx = $resourceStorageAccount.Context;
-Get-AzStorageBlob -Container $ResourceStorageContainerName -Context $ctx | Get-AzStorageBlobContent -Destination $baseFolder -Force
+Get-AzStorageBlob -Container $ResourcesContainerName -Context $ctx | Get-AzStorageBlobContent -Destination $baseFolder -Force
 
-C:\Startup.ps1 -AzAccount $AzAccount `
+Set-Location -Path $baseFolder
+.\Startup.ps1 -AzAccount $AzAccount `
             -AzPassword $AzPassword `
             -StorageAccountName $StorageAccountName `
             -StorageKey $StorageKey `
             -StorageConnection $StorageConnection `
             -OutlookVersion $OutlookVersion `
-            -QamInstallerVersion $QamInstallerVersion `
+            -QamVersion $QamVersion `
             -Branch $Branch `
             -ArtUserName $ArtUserName `
             -ArtPassword $ArtPassword `
@@ -85,5 +85,8 @@ C:\Startup.ps1 -AzAccount $AzAccount `
             -TestTags $TestTags `
             -InstallFeatures $InstallFeatures `
             -Dns $Dns `
-            -TestResourceGorupName $TestResourceGorupName `
-            -Environment $Environment
+            -TestResourceGroupName $TestResourceGroupName `
+            -Environment $Environment `
+            -Tenant $Tenant `
+            -TestResultContainerName $TestResultContainerName `
+            -BaseFolder $baseFolder
