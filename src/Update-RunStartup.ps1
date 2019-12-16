@@ -6,5 +6,6 @@ param(
 $resourceStorageAccount = Get-AzStorageAccount -ResourceGroupName "automationlabs" `
                                 -Name "automationadmin"
 $testStorageContext = $resourceStorageAccount.Context;
-$file = [System.IO.Path]::Combine($BaseFolder, "src\Run-Startup.ps1")
-Set-AzStorageBlobContent -File $file -Container "startup" -Blob "testresult.xml" -Context $testStorageContext -Force;
+$fileName = "Run-Startup.ps1";
+$file = [System.IO.Path]::Combine($BaseFolder, $fileName)
+Set-AzStorageBlobContent -File $file -Container "startup" -Blob $fileName -Context $testStorageContext -Force;
